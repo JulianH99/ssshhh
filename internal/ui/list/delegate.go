@@ -1,8 +1,9 @@
-package ui
+package list
 
 import (
 	"fmt"
 
+	"github.com/JulianH99/ssshhh/internal/ui"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,8 +25,6 @@ var defaultKeyMap = keymap{
 	),
 }
 
-type CreateKeyMsg struct{}
-
 func GetListDelegate() list.DefaultDelegate {
 	delegate := list.NewDefaultDelegate()
 
@@ -46,7 +45,7 @@ func GetListDelegate() list.DefaultDelegate {
 			case key.Matches(msg, defaultKeyMap.Create):
 				// need to create modal
 				return func() tea.Msg {
-					return CreateKeyMsg{}
+					return ui.CreateKeyMsg{}
 				}
 			}
 		}

@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/JulianH99/ssshhh/internal/config"
-	"github.com/JulianH99/ssshhh/internal/ui"
+	uiList "github.com/JulianH99/ssshhh/internal/ui/list"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -14,23 +14,6 @@ import (
 // 2. add it to config file with possibly custom ssh user, domain, etc
 // 3. list available keys in use from current config file
 
-type item struct {
-	title string
-	desc  string
-}
-
-func (i item) FilterValue() string {
-	return i.title
-}
-
-func (i item) Title() string {
-	return i.title
-}
-
-func (i item) Description() string {
-	return i.desc
-}
-
 type viewState int
 
 const (
@@ -39,9 +22,8 @@ const (
 )
 
 type model struct {
-	state         viewState
-	list          list.Model
-	createKeyForm *huh.Form
+	state viewState
+	list  uiList.List
 }
 
 func (m model) Init() tea.Cmd {
@@ -53,35 +35,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyCtrlC:
-			return m, tea.Quit
-		}
-
-	case tea.WindowSizeMsg:
-		m.list.SetSize(msg.Width, msg.Height)
-
-	case ui.CreateKeyMsg:
-		m.state = createKeyView
-	}
-
-	if m.state == createKeyView {
-
-		newFormModel, newCmd := m.createKeyForm.Update(msg)
-
-		m.createKeyForm = newFormModel.(*huh.Form)
+	if m.state == listView {
+		newModel, newCmd := m.list.Update(msg)
 		cmd = newCmd
-		cmds = append(cmds, m.createKeyForm.Init())
-
-		if m.createKeyForm.State == huh.StateCompleted {
-			m.state = listView
-			cmds = append(cmds, m.list.NewStatusMessage("Key created"))
-		}
-
-	} else {
-		m.list, cmd = m.list.Update(msg)
+		m.list = newModel.(uiList.List)
 	}
 
 	cmds = append(cmds, cmd)
@@ -93,23 +50,9 @@ func (m model) View() string {
 	switch m.state {
 	case listView:
 		return m.list.View()
-	case createKeyView:
-
-		return m.createKeyForm.View()
 	default:
 		return m.list.View()
 	}
-}
-
-func configToListItems(configs []config.SshConfig) []list.Item {
-
-	items := make([]list.Item, len(configs))
-
-	for i, config := range configs {
-		items[i] = item{title: config.User, desc: config.Host}
-	}
-
-	return items
 }
 
 func createKeyForm() *huh.Form {
@@ -138,6 +81,18 @@ func createKeyForm() *huh.Form {
 
 }
 
+func configToListItems(sshConfigs []config.SshConfig) []list.Item {
+
+	listItems := make([]list.Item, len(sshConfigs))
+
+	for i, sshConfig := range sshConfigs {
+		listItems[i] = uiList.NewItem(sshConfig.Host, sshConfig.User)
+	}
+
+	return listItems
+
+}
+
 func main() {
 	sshConfigs, err := config.SshConfigs()
 
@@ -146,16 +101,14 @@ func main() {
 	}
 
 	items := configToListItems(sshConfigs)
-	delegate := ui.GetListDelegate()
 
-	list := list.New(items, delegate, 0, 0)
-	list.Title = "Available SSH configurations"
+	listModel := uiList.New(items)
 
 	initialModel := model{
-		state:         listView,
-		list:          list,
-		createKeyForm: createKeyForm(),
+		state: listView,
+		list:  listModel,
 	}
+
 	p := tea.NewProgram(initialModel)
 
 	if _, err := p.Run(); err != nil {
