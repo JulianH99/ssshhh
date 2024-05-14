@@ -15,6 +15,7 @@ type List struct {
 func New(items []l.Item) List {
 	delegate := GetListDelegate()
 	list := l.New(items, delegate, 0, 0)
+	list.Title = "Available ssh configurations"
 
 	return List{
 		view:         list,
@@ -35,9 +36,7 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
-
 		}
-
 	case tea.WindowSizeMsg:
 		m.view.SetSize(msg.Width, msg.Height)
 	case ui.CreateKeyMsg:

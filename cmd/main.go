@@ -4,10 +4,11 @@ import (
 	"log"
 
 	"github.com/JulianH99/ssshhh/internal/config"
+	"github.com/JulianH99/ssshhh/internal/ui"
+	"github.com/JulianH99/ssshhh/internal/ui/create"
 	uiList "github.com/JulianH99/ssshhh/internal/ui/list"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/huh"
 )
 
 // 1. generate ssh keys with the usual ssh-keygen command
@@ -19,11 +20,13 @@ type viewState int
 const (
 	listView viewState = iota
 	createKeyView
+	modifyKeyView
 )
 
 type model struct {
-	state viewState
-	list  uiList.List
+	state  viewState
+	list   uiList.List
+	create create.Create
 }
 
 func (m model) Init() tea.Cmd {
@@ -35,10 +38,29 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyCtrlC, tea.KeyEsc:
+			return m, tea.Quit
+		}
+	case ui.CreateKeyMsg:
+		m.state = createKeyView
+	case ui.KeyCreatedMsg:
+		m.state = modifyKeyView
+	}
+
 	if m.state == listView {
 		newModel, newCmd := m.list.Update(msg)
 		cmd = newCmd
 		m.list = newModel.(uiList.List)
+
+	} else if m.state == createKeyView {
+		newModel, newCmd := m.create.Update(msg)
+		cmd = newCmd
+		cmds = append(cmds, m.create.Init())
+
+		m.create = newModel.(create.Create)
 	}
 
 	cmds = append(cmds, cmd)
@@ -50,39 +72,14 @@ func (m model) View() string {
 	switch m.state {
 	case listView:
 		return m.list.View()
+	case createKeyView:
+		return m.create.View()
 	default:
 		return m.list.View()
 	}
 }
 
-func createKeyForm() *huh.Form {
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewInput().
-				Key("path").
-				Title("Path").
-				Placeholder("~/.ssh/id_ed25519"),
-			huh.NewSelect[string]().
-				Key("type").
-				Title("Encryption key").
-				Options(
-					huh.NewOption("ed25519", "ed25519"),
-					huh.NewOption("rsa", "rsa"),
-				),
-			huh.NewInput().
-				Key("comment").
-				Title("Comment").
-				Placeholder("user@hostname.com").
-				Description("Enter a comment for your key"),
-		),
-	)
-
-	return form
-
-}
-
 func configToListItems(sshConfigs []config.SshConfig) []list.Item {
-
 	listItems := make([]list.Item, len(sshConfigs))
 
 	for i, sshConfig := range sshConfigs {
@@ -90,7 +87,6 @@ func configToListItems(sshConfigs []config.SshConfig) []list.Item {
 	}
 
 	return listItems
-
 }
 
 func main() {
@@ -103,10 +99,12 @@ func main() {
 	items := configToListItems(sshConfigs)
 
 	listModel := uiList.New(items)
+	createModel := create.New()
 
 	initialModel := model{
-		state: listView,
-		list:  listModel,
+		state:  listView,
+		list:   listModel,
+		create: createModel,
 	}
 
 	p := tea.NewProgram(initialModel)
