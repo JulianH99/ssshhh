@@ -16,9 +16,7 @@ type SshConfig struct {
 }
 
 func CreateNewConfig(host, user, domain, keyPath string, additionConfig map[string]string) SshConfig {
-
 	return SshConfig{host, user, domain, keyPath, additionConfig}
-
 }
 
 func parseLinesIntoSshConfig(lines []string) SshConfig {
