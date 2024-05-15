@@ -7,6 +7,7 @@ import (
 	"github.com/JulianH99/ssshhh/internal/ui"
 	"github.com/JulianH99/ssshhh/internal/ui/create"
 	uiList "github.com/JulianH99/ssshhh/internal/ui/list"
+	"github.com/JulianH99/ssshhh/internal/ui/modify"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -27,6 +28,7 @@ type model struct {
 	state  viewState
 	list   uiList.List
 	create create.Create
+	modify modify.Modify
 }
 
 func (m model) Init() tea.Cmd {
@@ -47,20 +49,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ui.CreateKeyMsg:
 		m.state = createKeyView
 	case ui.KeyCreatedMsg:
+		m.modify.SetKeyPath(m.create.GetKeyPath())
 		m.state = modifyKeyView
+		cmds = append(cmds, tea.Cmd(tea.ClearScreen))
 	}
 
-	if m.state == listView {
+	switch m.state {
+	case listView:
 		newModel, newCmd := m.list.Update(msg)
 		cmd = newCmd
 		m.list = newModel.(uiList.List)
+	case createKeyView:
 
-	} else if m.state == createKeyView {
 		newModel, newCmd := m.create.Update(msg)
 		cmd = newCmd
 		cmds = append(cmds, m.create.Init())
 
 		m.create = newModel.(create.Create)
+	case modifyKeyView:
+		newModel, newCmd := m.modify.Update(msg)
+		cmd = newCmd
+		cmds = append(cmds, m.modify.Init())
+		m.modify = newModel.(modify.Modify)
 	}
 
 	cmds = append(cmds, cmd)
@@ -74,6 +84,8 @@ func (m model) View() string {
 		return m.list.View()
 	case createKeyView:
 		return m.create.View()
+	case modifyKeyView:
+		return m.modify.View()
 	default:
 		return m.list.View()
 	}
@@ -100,11 +112,13 @@ func main() {
 
 	listModel := uiList.New(items)
 	createModel := create.New()
+	modifyModel := modify.New()
 
 	initialModel := model{
 		state:  listView,
 		list:   listModel,
 		create: createModel,
+		modify: modifyModel,
 	}
 
 	p := tea.NewProgram(initialModel)

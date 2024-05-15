@@ -15,6 +15,10 @@ type Create struct {
 	newKeyPath   string
 }
 
+func (m Create) GetKeyPath() string {
+	return m.newKeyPath
+}
+
 func (m Create) Init() tea.Cmd {
 	return m.form.Init()
 }

@@ -15,6 +15,12 @@ type SshConfig struct {
 	AdditionalConfig map[string]string
 }
 
+func CreateNewConfig(host, user, domain, keyPath string, additionConfig map[string]string) SshConfig {
+
+	return SshConfig{host, user, domain, keyPath, additionConfig}
+
+}
+
 func parseLinesIntoSshConfig(lines []string) SshConfig {
 
 	re := regexp.MustCompile("\\s|=")
