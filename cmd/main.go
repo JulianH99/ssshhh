@@ -49,7 +49,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ui.CreateKeyMsg:
 		m.state = createKeyView
 	case ui.KeyCreatedMsg:
-		m.modify.SetKeyPath(m.create.GetKeyPath())
+		m.modify.SetKeyPath(msg.Key)
 		m.state = modifyKeyView
 		cmds = append(cmds, tea.Cmd(tea.ClearScreen))
 	case ui.SshFileEditedMsg:
@@ -65,7 +65,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = newCmd
 		m.list = newModel.(uiList.List)
 	case createKeyView:
-
 		newModel, newCmd := m.create.Update(msg)
 		cmd = newCmd
 		cmds = append(cmds, m.create.Init())

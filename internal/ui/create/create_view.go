@@ -42,20 +42,18 @@ func (m Create) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case execSshKeygen:
-		fmt.Println("execSshKeygen")
 		var (
 			path    = m.form.GetString("path")
 			comment = m.form.GetString("comment")
 			keyType = m.form.GetString("type")
 		)
 
-		create_ssh_config := config.CreateSshKeyConfig(path, keyType, comment)
-		create_command_exec := config.CreateSshKey(create_ssh_config)
+		createSshConfig := config.CreateSshKeyConfig(path, keyType, comment)
+		createCommandExec := config.CreateSshKey(createSshConfig)
 
-		return m, tea.ExecProcess(create_command_exec, func(err error) tea.Msg {
+		return m, tea.ExecProcess(createCommandExec, func(err error) tea.Msg {
 			fmt.Println("exec key has finished", err)
-			m.newKeyPath = create_ssh_config.Path()
-			return ui.KeyCreatedMsg{}
+			return ui.KeyCreatedMsg{Key: createSshConfig.Path()}
 		})
 	}
 

@@ -9,11 +9,16 @@ import (
 func sshConfigToBytes(sshConfig SshConfig) string {
 	var strb strings.Builder
 
+	// set the path to have ~ on the start, better for windows
+	// configurations
+	sshRelativeIndex := strings.Index(sshConfig.Key, ".ssh")
+	sshTildePath := fmt.Sprintf("~/%s", sshConfig.Key[sshRelativeIndex:])
+
 	strb.WriteString("\n")
 	strb.WriteString(fmt.Sprintf("Host %s\n", sshConfig.Host))
 	strb.WriteString(fmt.Sprintf("User %s\n", sshConfig.User))
 	strb.WriteString(fmt.Sprintf("Hostname %s\n", sshConfig.Domain))
-	strb.WriteString(fmt.Sprintf("IdentityFile %s\n", sshConfig.Key))
+	strb.WriteString(fmt.Sprintf("IdentityFile %s\n", sshTildePath))
 	for settingName, value := range sshConfig.AdditionalConfig {
 		strb.WriteString(fmt.Sprintf("%s %s\n", settingName, value))
 	}

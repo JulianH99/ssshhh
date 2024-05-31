@@ -25,7 +25,6 @@ func (m Modify) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.form = newForm.(*huh.Form)
 
 	if m.form.State == huh.StateCompleted && !m.formFinished {
-
 		m.formFinished = true
 
 		sshConfig := config.CreateNewConfig(
@@ -35,10 +34,8 @@ func (m Modify) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.keyPath,
 			stringToMap(m.form.GetString("extras")),
 		)
-
 		return m, editSshConfig(sshConfig)
 	}
-
 	return m, cmd
 }
 
@@ -60,7 +57,7 @@ func modifyKeyForm() *huh.Form {
 			huh.NewInput().
 				Key("user").
 				Title("User").
-				Placeholder("github.com"),
+				Placeholder("githubuser"),
 			huh.NewText().
 				Key("extras").
 				Title("extras").

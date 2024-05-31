@@ -2,7 +2,7 @@ package ui
 
 type CreateKeyMsg struct{}
 
-type KeyCreatedMsg struct{}
+type KeyCreatedMsg struct{ Key string }
 
 type SshFileEditedMsg struct{}
 
