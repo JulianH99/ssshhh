@@ -70,14 +70,22 @@ func getAvailableConfigs(body []byte) []SshConfig {
 	return sshConfigs
 }
 
+func sshConfigFilePath() (string, error) {
+
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(homedir, ".ssh", "config"), nil
+}
+
 func SshConfigs() ([]SshConfig, error) {
 	// get .ssh/config file
-	homedir, err := os.UserHomeDir()
+	sshConfigPath, err := sshConfigFilePath()
 	if err != nil {
 		return nil, err
 	}
-
-	sshConfigPath := path.Join(homedir, ".ssh", "config")
 
 	body, err := os.ReadFile(sshConfigPath)
 

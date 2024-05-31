@@ -41,6 +41,8 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.view.SetSize(msg.Width, msg.Height)
 	case ui.CreateKeyMsg:
 		return m, m.view.NewStatusMessage("Create new key...")
+	case ui.SshFileEditedMsg:
+		return m, m.view.NewStatusMessage("Added ssh config entry to file")
 	}
 
 	m.view, cmd = m.view.Update(msg)
