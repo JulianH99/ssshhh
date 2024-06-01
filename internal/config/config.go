@@ -20,7 +20,6 @@ func CreateNewConfig(host, user, domain, keyPath string, additionConfig map[stri
 }
 
 func parseLinesIntoSshConfig(lines []string) SshConfig {
-
 	re := regexp.MustCompile("\\s|=")
 	sshConfig := SshConfig{}
 	extras := make(map[string]string)
@@ -62,9 +61,11 @@ func getAvailableConfigs(body []byte) []SshConfig {
 		}
 	}
 
-	for i := 0; i < len(secIndexes)-1; i++ {
-		if i < len(secIndexes)-1 {
+	for i := 0; i < len(secIndexes); i++ {
+		if i != len(secIndexes)-1 {
 			sshConfigs = append(sshConfigs, parseLinesIntoSshConfig(lines[secIndexes[i]:secIndexes[i+1]-1]))
+		} else {
+			sshConfigs = append(sshConfigs, parseLinesIntoSshConfig(lines[secIndexes[i]:]))
 		}
 	}
 	return sshConfigs

@@ -1,6 +1,9 @@
 package list
 
 import (
+	"log"
+
+	"github.com/JulianH99/ssshhh/internal/config"
 	"github.com/JulianH99/ssshhh/internal/ui"
 	l "github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,8 +15,9 @@ type List struct {
 	selectedItem string
 }
 
-func New(items []l.Item) List {
+func New() List {
 	delegate := GetListDelegate()
+	items := readSshConfigItems()
 	list := l.New(items, delegate, 0, 0)
 	list.Title = "Available ssh configurations"
 
@@ -42,6 +46,9 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ui.CreateKeyMsg:
 		return m, m.view.NewStatusMessage("Create new key...")
 	case ui.SshFileEditedMsg:
+		items := readSshConfigItems()
+		m.items = fromBubbleArray(items)
+		m.view.SetItems(items)
 		return m, m.view.NewStatusMessage("Added ssh config entry to file")
 	}
 
@@ -51,4 +58,24 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m List) View() string {
 	return m.view.View()
+}
+
+func configToListItems(sshConfigs []config.SshConfig) []l.Item {
+	listItems := make([]l.Item, len(sshConfigs))
+
+	for i, sshConfig := range sshConfigs {
+		listItems[i] = NewItem(sshConfig.Host, sshConfig.User)
+	}
+
+	return listItems
+}
+
+func readSshConfigItems() []l.Item {
+	sshConfigs, err := config.SshConfigs()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return configToListItems(sshConfigs)
 }

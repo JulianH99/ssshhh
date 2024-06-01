@@ -3,12 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/JulianH99/ssshhh/internal/config"
 	"github.com/JulianH99/ssshhh/internal/ui"
 	"github.com/JulianH99/ssshhh/internal/ui/create"
 	uiList "github.com/JulianH99/ssshhh/internal/ui/list"
 	"github.com/JulianH99/ssshhh/internal/ui/modify"
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -68,7 +66,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		newModel, newCmd := m.create.Update(msg)
 		cmd = newCmd
 		cmds = append(cmds, m.create.Init())
-
 		m.create = newModel.(create.Create)
 	case modifyKeyView:
 		newModel, newCmd := m.modify.Update(msg)
@@ -95,26 +92,9 @@ func (m model) View() string {
 	}
 }
 
-func configToListItems(sshConfigs []config.SshConfig) []list.Item {
-	listItems := make([]list.Item, len(sshConfigs))
-
-	for i, sshConfig := range sshConfigs {
-		listItems[i] = uiList.NewItem(sshConfig.Host, sshConfig.User)
-	}
-
-	return listItems
-}
-
 func main() {
-	sshConfigs, err := config.SshConfigs()
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	items := configToListItems(sshConfigs)
-
-	listModel := uiList.New(items)
+	listModel := uiList.New()
 	createModel := create.New()
 	modifyModel := modify.New()
 
