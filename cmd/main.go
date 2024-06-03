@@ -80,16 +80,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	var view string
 	switch m.state {
 	case listView:
-		return m.list.View()
+		view = m.list.View()
 	case createKeyView:
-		return m.create.View()
+		view = m.create.View()
 	case modifyKeyView:
-		return m.modify.View()
+		view = m.modify.View()
 	default:
-		return m.list.View()
+		view = m.list.View()
 	}
+
+	return ui.AppStyle.Render(view)
+	// return view
 }
 
 func main() {

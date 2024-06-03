@@ -19,6 +19,8 @@ func New() List {
 	delegate := GetListDelegate()
 	items := readSshConfigItems()
 	list := l.New(items, delegate, 0, 0)
+	list.Styles.Title = ui.ListTitleStyle
+	list.Styles.StatusBar = ui.ListStatusBarStyle
 	list.Title = "Available ssh configurations"
 
 	return List{
@@ -42,14 +44,14 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case tea.WindowSizeMsg:
-		m.view.SetSize(msg.Width, msg.Height)
+		m.view.SetSize(msg.Width, msg.Height-2)
 	case ui.CreateKeyMsg:
-		return m, m.view.NewStatusMessage("Create new key...")
+		return m, m.view.NewStatusMessage(ui.StatusMessageStyle("Create new key..."))
 	case ui.SshFileEditedMsg:
 		items := readSshConfigItems()
 		m.items = fromBubbleArray(items)
 		m.view.SetItems(items)
-		return m, m.view.NewStatusMessage("Added ssh config entry to file")
+		return m, m.view.NewStatusMessage(ui.StatusMessageStyle("Added ssh config entry to file"))
 	}
 
 	m.view, cmd = m.view.Update(msg)

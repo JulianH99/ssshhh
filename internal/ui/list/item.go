@@ -1,6 +1,9 @@
 package list
 
-import "github.com/charmbracelet/bubbles/list"
+import (
+	"github.com/JulianH99/ssshhh/internal/ui"
+	"github.com/charmbracelet/bubbles/list"
+)
 
 type listItem struct {
 	title string
@@ -12,11 +15,11 @@ func (i listItem) FilterValue() string {
 }
 
 func (i listItem) Title() string {
-	return i.title
+	return ui.ListItemTitleStyle.Render(i.title)
 }
 
 func (i listItem) Description() string {
-	return i.desc
+	return ui.ListDescStyle.Render(i.desc)
 }
 
 func fromBubbleItem(i list.Item) listItem {

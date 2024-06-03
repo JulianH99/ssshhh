@@ -3,6 +3,7 @@ package list
 import (
 	"fmt"
 
+	"github.com/JulianH99/ssshhh/internal/ui"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -40,7 +41,7 @@ func GetListDelegate() list.DefaultDelegate {
 		case tea.KeyMsg:
 			switch {
 			case key.Matches(msg, defaultKeyMap.Choose):
-				return m.NewStatusMessage(fmt.Sprintf("Selected %s", title))
+				return m.NewStatusMessage(ui.StatusMessageStyle(fmt.Sprintf("Selected %s", title)))
 			case key.Matches(msg, defaultKeyMap.Create):
 				// need to create modal
 				return switchToCreateKeyView
