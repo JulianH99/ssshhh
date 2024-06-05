@@ -2,6 +2,7 @@ package modify
 
 import (
 	"github.com/JulianH99/ssshhh/internal/config"
+	"github.com/JulianH99/ssshhh/internal/ui"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 )
@@ -63,7 +64,7 @@ func modifyKeyForm() *huh.Form {
 				Title("extras").
 				Placeholder("IdentitiesOnly yes"),
 		),
-	)
+	).WithTheme(ui.FormTheme())
 }
 
 func New() Modify {

@@ -84,7 +84,7 @@ func createKeyForm() *huh.Form {
 				Placeholder("user@hostname.com").
 				Description("Enter a comment for your key"),
 		),
-	)
+	).WithTheme(ui.FormTheme())
 
 	return form
 
