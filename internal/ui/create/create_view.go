@@ -7,6 +7,7 @@ import (
 	"github.com/JulianH99/ssshhh/internal/ui"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type Create struct {
@@ -61,7 +62,12 @@ func (m Create) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Create) View() string {
-	return m.form.View()
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		ui.FormTitleStyle.Render("Create ssh key settings"),
+		m.form.View(),
+	)
+
 }
 
 func createKeyForm() *huh.Form {

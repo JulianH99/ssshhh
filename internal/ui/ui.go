@@ -22,6 +22,11 @@ var (
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(cPrimary)
 
+	FormTitleStyle = lipgloss.NewStyle().
+			Foreground(cWhite).
+			Background(cPrimary).
+			MarginBottom(1)
+
 	ListTitleStyle = lipgloss.NewStyle().
 			Foreground(cWhite).
 			Background(cPrimary).
