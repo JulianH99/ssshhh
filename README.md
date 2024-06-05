@@ -1,6 +1,5 @@
 # What is this
 ---
-
 ssshhh is an terminal app or tui that aims to help managing available
 configurations found in the `~/.ssh/config` file. It's mainly built for personal
 purposes since I have the need to work on several repositories all with
@@ -22,7 +21,8 @@ Planned features:
 - Have subcommands so that showing a list does not involve starting all the app,
 	and the same for all other currently available features
 - Add the key to the ssh-agent too (not hard, just haven't done it yet)
-- Better ui
+- Better ui, some styles were already refactored but I doubt the colors, maybe
+in future iterations I will just use a colorscheme like gruvbox or kanagawa
 
 ## Missing stuff (extras)
 
